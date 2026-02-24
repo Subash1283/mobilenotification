@@ -19,4 +19,15 @@ export class AppController {
       message: message
     };
   }
-}
+    @Post('sendOtp')
+    async sendOtp(@Body() body:{email:string}){
+      return this.service.sendOtp(body.email);
+    }
+      @Post('verifyOtp')
+    async verifyOtp(@Body() body:{email:string,otp:string}){
+      return this.service.verifyOtp(body.email,body.otp);
+    }
+  }
+  
+  
+
