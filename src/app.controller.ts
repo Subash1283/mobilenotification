@@ -5,10 +5,7 @@ import { sendNotificationDto1 } from './dto/token.dto';
 
 @Controller()
 export class AppController {
-  
-  constructor(
-    private readonly service: SendNotificationService
-  ) {}
+  constructor(private readonly service: SendNotificationService) {}
 
   @Post('send')
   async send(@Body() sendDto: sendNotificationDto1) {
@@ -16,18 +13,15 @@ export class AppController {
 
     return {
       success: true,
-      message: message
+      message: message,
     };
   }
-    @Post('sendOtp')
-    async sendOtp(@Body() body:{email:string}){
-      return this.service.sendOtp(body.email);
-    }
-  @Post('verifyOtp')
-  verifyOtp(@Body() body:{email:string,otp:string}){
-      return this.service.verifyOtp(body.email,body.otp);
-    }
+  @Post('sendOtp')
+  async sendOtp(@Body() body: { email: string }) {
+    return this.service.sendOtp(body.email);
   }
-  
-  
-
+  @Post('verifyOtp')
+  verifyOtp(@Body() body: { email: string; otp: string }) {
+    return this.service.verifyOtp(body.email, body.otp);
+  }
+}

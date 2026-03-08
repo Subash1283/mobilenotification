@@ -21,7 +21,7 @@ export class SendNotificationService {
       };
 
       return await admin.messaging().sendEachForMulticast(message);
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException(
         'Failed to send push notification',
       );
@@ -87,7 +87,7 @@ export class SendNotificationService {
         message: 'OTP sent successfully to your email.',
         expiresIn: '60 seconds',
       };
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('Failed to send OTP email');
     }
   }
