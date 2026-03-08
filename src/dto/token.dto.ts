@@ -1,5 +1,5 @@
-export class sendNotificationDto1{
-    token:string[];
-    title:string;
-    body:string;
+export class sendNotificationDto1 {
+  token: string[];
+  title: string;
+  body: string;
 }
