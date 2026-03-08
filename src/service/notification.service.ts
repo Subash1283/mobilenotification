@@ -2,11 +2,11 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-} from "@nestjs/common";
-import admin from "../config/firebase.config";
-import { sendNotificationDto1 } from "../dto/token.dto";
-import { BatchResponse } from "firebase-admin/messaging";
-import * as nodemailer from "nodemailer";
+} from '@nestjs/common';
+import admin from '../config/firebase.config';
+import { sendNotificationDto1 } from '../dto/token.dto';
+import { BatchResponse } from 'firebase-admin/messaging';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class SendNotificationService {
@@ -23,7 +23,7 @@ export class SendNotificationService {
       return await admin.messaging().sendEachForMulticast(message);
     } catch (error) {
       throw new InternalServerErrorException(
-        "Failed to send push notification",
+        'Failed to send push notification',
       );
     }
   }
@@ -32,10 +32,7 @@ export class SendNotificationService {
         🔐 OTP SECTION
   ======================== */
 
-  private otpStore = new Map<
-    string,
-    { otp: string; expireAt: number }
-  >();
+  private otpStore = new Map<string, { otp: string; expireAt: number }>();
 
   // Generate 6-digit OTP
   private generateOtp(): string {
@@ -50,7 +47,7 @@ export class SendNotificationService {
       this.otpStore.set(email, { otp, expireAt });
 
       const transporter = nodemailer.createTransport({
-        service: "gmail",
+        service: 'gmail',
         auth: {
           user: process.env.MAIL_USER,
           pass: process.env.MAIL_PASS,
@@ -58,30 +55,40 @@ export class SendNotificationService {
       });
 
       await transporter.sendMail({
-        from: `"Your App Name" <${process.env.MAIL_USER}>`,
+        from: `"Nabil bank" <${process.env.MAIL_USER}>`,
         to: email,
-        subject: "Your Verification OTP Code",
+        subject: 'Your Verification OTP Code',
         html: `
-          <div style="font-family: Arial, sans-serif; padding:20px;">
-            <h2 style="color:#2c3e50;">Email Verification</h2>
-            <p>Hello,</p>
-            <p>Your One-Time Password (OTP) is:</p>
-            <h1 style="color:#3498db; letter-spacing:5px;">${otp}</h1>
-            <p>This OTP will expire in <b>1 minute</b>.</p>
-            <p>If you did not request this, please ignore this email.</p>
-            <br/>
-            <small style="color:gray;">© 2026 Your App Name</small>
-          </div>
-        `,
+    <div style="font-family: Arial, sans-serif; padding:20px;">
+      <h2 style="color:#2c3e50;">Email Verification</h2>
+      <p>Hello,</p>
+      <p>Your One-Time Password (OTP) is:</p>
+      <h1 style="color:#3498db; letter-spacing:5px;">${otp}</h1>
+      <p>This OTP will expire in <b>1 minute</b>.</p>
+      <p>If you did not request this, please ignore this email.</p>
+      <br/>
+      <footer style="display: flex; align-items: center; gap: 8px; color: gray; padding: 8px;">
+        <img src="cid:nabillogo" alt="Nabil Bank Logo" style="height: 24px; width: auto;">
+        <small>NABIL BANK</small>
+      </footer>
+    </div>
+  `,
+        attachments: [
+          {
+            filename: 'nabil.jpg',
+            path: 'src/photos/nabil.jpg', // relative to your Node.js project
+            cid: 'nabillogo', // matches src="cid:nabillogo"
+          },
+        ],
       });
 
       return {
         success: true,
-        message: "OTP sent successfully to your email.",
-        expiresIn: "60 seconds",
+        message: 'OTP sent successfully to your email.',
+        expiresIn: '60 seconds',
       };
     } catch (error) {
-      throw new InternalServerErrorException("Failed to send OTP email");
+      throw new InternalServerErrorException('Failed to send OTP email');
     }
   }
 
@@ -89,27 +96,25 @@ export class SendNotificationService {
     const record = this.otpStore.get(email);
 
     if (!record) {
-      throw new BadRequestException(
-        "OTP not found or already used.",
-      );
+      throw new BadRequestException('OTP not found or already used.');
     }
 
     if (Date.now() > record.expireAt) {
       this.otpStore.delete(email);
       throw new BadRequestException(
-        "OTP has expired. Please request a new one.",
+        'OTP has expired. Please request a new one.',
       );
     }
 
     if (record.otp !== otp) {
-      throw new BadRequestException("Invalid OTP.");
+      throw new BadRequestException('Invalid OTP.');
     }
 
     this.otpStore.delete(email);
 
     return {
       success: true,
-      message: "OTP verified successfully.",
+      message: 'OTP verified successfully.',
     };
   }
 }
